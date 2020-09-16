@@ -1,7 +1,6 @@
 const path = require('path')
 
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-
 const config = require('../config')
 
 function resolve (dir) {
@@ -47,7 +46,7 @@ module.exports = {
           limit: 8 * 1024,
           name: "imgs/[name].[hash:7].[ext]",
           esModule: false,
-          outputPath: "imgs",
+          outputPath: "static/imgs",
         },
       },
       {
@@ -55,7 +54,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'media/[name].[hash:7].[ext]'
+          name: 'static/media/[name].[hash:7].[ext]'
         }
       },
       {
@@ -63,7 +62,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 8 * 1024,
-          name: 'fonts/[name].[hash:7].[ext]'
+          name: 'static/fonts/[name].[hash:7].[ext]'
         }
       },
       {
@@ -75,11 +74,11 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
   ],
-  externals: {
-    'vue': 'Vue',
-    'vue-router': 'VueRouter',
-    'element-ui': 'ElementUI'  
-  },
+  // externals: {
+  //   'vue': 'Vue',
+  //   'vue-router': 'VueRouter',
+  //   'element-ui': 'ElementUI'  
+  // },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {

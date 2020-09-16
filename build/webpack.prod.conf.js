@@ -1,17 +1,20 @@
 const path = require("path");
-
+const webpack = require('webpack')
 const config = require('../config')
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
 
 const SimpleProgressWebpackPlugin = require( 'simple-progress-webpack-plugin' )
 
 const { merge } = require('webpack-merge')
 const common = require('./webpack.base.conf')
-
+function resolve (dir) {
+  return path.join(__dirname, '..', dir)
+}
 const webpackConfig = merge(common, {
   mode: "production",
   output: {
@@ -162,6 +165,15 @@ const webpackConfig = merge(common, {
     new MiniCssPlugin({
       filename: "static/css/[name].[hash:10].css",
       chunkFilename: "static/css/[name].[contenthash:8].css",
+    }),
+    // 告诉webpack哪些库不参与打包，同时使用时的名称也得变
+    new webpack.DllReferencePlugin({
+      manifest: resolve('dll/vendor-manifest.json'),
+    }),
+    // 将某个文件打包输出到build目录下，并在html中自动引入该资源
+    new AddAssetHtmlWebpackPlugin({
+      filepath: resolve('dll/vendor.dll.js'),
+      hash: true
     }),
     // 显示打包进度百分比
     new SimpleProgressWebpackPlugin(),

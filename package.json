@@ -1,5 +1,5 @@
 {
-  "name": "webpack-li",
+  "name": "0914-webpack",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "build": "cross-env NODE_ENV=production env_config=prod webpack --config build/webpack.prod.conf.js",
-    "analyze": "cross-env NODE_ENV=production npm_config_report=true yarn build"
+    "analyze": "cross-env NODE_ENV=production npm_config_report=true yarn build",
+    "dll": "webpack -p --progress --config build/webpack.dll.conf.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
     "add": "^2.0.6",
+    "add-asset-html-webpack-plugin": "^3.1.3",
     "babel-loader": "^8.1.0",
     "chalk": "^4.1.0",
     "clean-webpack-plugin": "^3.0.0",
