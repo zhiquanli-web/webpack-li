@@ -2,7 +2,7 @@ const path = require("path");
 
 const config = require('../config')
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const MiniCssPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -11,6 +11,22 @@ const SimpleProgressWebpackPlugin = require( 'simple-progress-webpack-plugin' )
 
 const { merge } = require('webpack-merge')
 const common = require('./webpack.base.conf')
+
+const commomCssLoader = [
+  MiniCssExtractPlugin.loader,
+  'css-loader',
+  {
+    loader: 'postcss-loader',
+    options: {
+      postcssOptions: {
+        plugins: [
+          'postcss-preset-env',
+        ],
+      },
+    },
+  },
+] 
+
 
 const webpackConfig = merge(common, {
   mode: "production",
@@ -24,25 +40,15 @@ const webpackConfig = merge(common, {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: [...commomCssLoader]
       },
       {
         test: /\.scss$/,
-        use: [
-          MiniCssPlugin.loader,
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              ident: "postcss", // 基本写法
-              plugins: () => [
-                // postcss的插件
-                require("postcss-preset-env")(),
-              ],
-            },
-          },
-          "sass-loader",
-        ],
+        use: [...commomCssLoader, "sass-loader",],
+      },
+      {
+        test: /\.sass$/,
+        use: [...commomCssLoader, "sass-loader",],
       },
       // {
       //   // 第三种方式：按需加载
@@ -159,7 +165,7 @@ const webpackConfig = merge(common, {
       // chunksSortMode: 'dependency'
     }),
     new CleanWebpackPlugin(),
-    new MiniCssPlugin({
+    new MiniCssExtractPlugin({
       filename: "static/css/[name].[hash:10].css",
       chunkFilename: "static/css/[name].[contenthash:8].css",
     }),
