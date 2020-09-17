@@ -44,8 +44,13 @@ const devWebpackConfig = merge(common, {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.scss/,
-        use: ["vue-style-loader", "css-loader", "sass-loader"],
+        test: /\.scss$/,
+        // 这里不能使用vue-style-loader，.vue文件样式(!css)不生效
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.sass$/,
+        use: ['style-loader', 'css-loader', 'sass-loader']
       }
     ],
   },
