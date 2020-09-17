@@ -1,51 +1,55 @@
 const path = require("path");
-const webpack = require('webpack')
-const config = require('../config')
+const webpack = require("webpack");
+const config = require("../config");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const MiniCssPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const AddAssetHtmlWebpackPlugin = require("add-asset-html-webpack-plugin");
 
-const SimpleProgressWebpackPlugin = require( 'simple-progress-webpack-plugin' )
+const SimpleProgressWebpackPlugin = require("simple-progress-webpack-plugin");
 
-const { merge } = require('webpack-merge')
-const common = require('./webpack.base.conf')
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
+const { merge } = require("webpack-merge");
+const common = require("./webpack.base.conf");
+
+const commomCssLoader = [
+  MiniCssExtractPlugin.loader,
+  "css-loader",
+  {
+    loader: "postcss-loader",
+    options: {
+      postcssOptions: {
+        loader: "postcss-loader", // 基本写法
+        plugins: ["postcss-preset-env"],
+      },
+    },
+  },
+];
+function resolve(dir) {
+  return path.join(__dirname, "..", dir);
 }
 const webpackConfig = merge(common, {
   mode: "production",
   output: {
     path: config.build.assetsRoot,
-    filename: 'static/js/name.[chunkhash:7].js',
-    chunkFilename: 'static/js/[id].[chunkhash:7].js'
+    filename: "static/js/name.[chunkhash:7].js",
+    chunkFilename: "static/js/[id].[chunkhash:7].js",
   },
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: [...commomCssLoader],
       },
       {
         test: /\.scss$/,
-        use: [
-          MiniCssPlugin.loader,
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              ident: "postcss", // 基本写法
-              plugins: () => [
-                // postcss的插件
-                require("postcss-preset-env")(),
-              ],
-            },
-          },
-          "sass-loader",
-        ],
+        use: [...commomCssLoader, "sass-loader"],
+      },
+      {
+        test: /\.sass$/,
+        use: [...commomCssLoader, "sass-loader"],
       },
       // {
       //   // 第三种方式：按需加载
@@ -137,24 +141,24 @@ const webpackConfig = merge(common, {
         canPrint: true,
       }),
     ],
-    mergeDuplicateChunks: true
+    mergeDuplicateChunks: true,
   },
   // 超过250k给出警告
   performance: {
-    hints: 'warning'
+    hints: "warning",
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: config.build.index,
-      template: './public/index.html',
+      template: "./public/index.html",
       inject: true,
       // favicon: resolve('favicon.ico'),
-      title: 'webpack-demo',
+      title: "webpack-demo",
       path: config.build.assetsPublicPath + config.build.assetsSubDirectory,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
-        removeAttributeQuotes: true
+        removeAttributeQuotes: true,
         // more webpackConfig:
         // https://github.com/kangax/html-minifier#webpackConfig-quick-reference
       },
@@ -162,18 +166,18 @@ const webpackConfig = merge(common, {
       // chunksSortMode: 'dependency'
     }),
     new CleanWebpackPlugin(),
-    new MiniCssPlugin({
+    new MiniCssExtractPlugin({
       filename: "static/css/[name].[hash:10].css",
       chunkFilename: "static/css/[name].[contenthash:8].css",
     }),
     // 告诉webpack哪些库不参与打包，同时使用时的名称也得变
     new webpack.DllReferencePlugin({
-      manifest: resolve('dll/vendor-manifest.json'),
+      manifest: resolve("dll/vendor-manifest.json"),
     }),
     // 将某个文件打包输出到build目录下，并在html中自动引入该资源
     new AddAssetHtmlWebpackPlugin({
-      filepath: resolve('dll/vendor.dll.js'),
-      hash: true
+      filepath: resolve("dll/vendor.dll.js"),
+      hash: true,
     }),
     // 显示打包进度百分比
     new SimpleProgressWebpackPlugin(),
@@ -189,35 +193,31 @@ const webpackConfig = merge(common, {
     modules: false,
     children: false,
     chunks: false,
-    chunkModules: false
-  }
+    chunkModules: false,
+  },
 });
 
 // 开启gzip压缩
 if (config.build.productionGzip) {
-  const CompressionWebpackPlugin = require('compression-webpack-plugin')
+  const CompressionWebpackPlugin = require("compression-webpack-plugin");
   webpackConfig.plugins.push(
     new CompressionWebpackPlugin({
-      algorithm: 'gzip',// 压缩算法
-      threshold: 10 * 1024,// 处理大于8kb的资源
+      algorithm: "gzip", // 压缩算法
+      threshold: 10 * 1024, // 处理大于8kb的资源
       deleteOriginalAssets: false, // 是否删除原文件
-      cache: true,// 开启缓存
-      test: new RegExp(
-        '\\.(' +
-        ['js', 'css'].join('|') +
-        ')$'
-      ),
+      cache: true, // 开启缓存
+      test: new RegExp("\\.(" + ["js", "css"].join("|") + ")$"),
       minRatio: 0.8,
-      filename: 'static/js/[name].gz[query]',
+      filename: "static/js/[name].gz[query]",
     })
-  )
+  );
 }
 // 启用打包分析
 if (config.build.bundleAnalyzerReport) {
-  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-  webpackConfig.plugins.push(new BundleAnalyzerPlugin())
+  const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+    .BundleAnalyzerPlugin;
+  webpackConfig.plugins.push(new BundleAnalyzerPlugin());
 }
-
 
 // 打包进度条插件 simple-progress-webpack-plugin
 module.exports = webpackConfig;
